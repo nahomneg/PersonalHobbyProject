@@ -5,7 +5,7 @@ const app = express();
 require('./db/dbconnection');
 const danceRoute = require('./routes/danceRoutes');
 
-app.use(express.urlencoded({extended:true}))
+app.use(express.urlencoded({extended:true}));
 app.use(express.json());
 
 app.use('/dances',danceRoute);

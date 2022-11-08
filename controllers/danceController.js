@@ -15,7 +15,8 @@ const getAllDances = function (req, res) {
         console.log("Found dances", dances.length);
         res.json(dances);
     });
-}
+};
+
 const getDanceById = function (req, res) {
     const danceId = req.params.id;
     const response = {status: process.env.STATUS_CODE_CREATED, message: null};
@@ -30,7 +31,7 @@ const getDanceById = function (req, res) {
     });
 
 
-}
+};
 
 const addDance = function (req, res) {
     const newDance = {
@@ -47,8 +48,42 @@ const addDance = function (req, res) {
         }
         res.status(response.status).json(response.message);
     });
+};
+
+const _partialUpdate = function (req,dance,res, response) {
+    if(req.body.name)
+        dance.name = req.body.name;
+    if(req.body.countryOfOrigin)
+        dance.countryOfOrigin = req.body.countryOfOrigin;
+    dance.save(function (err, updatedDance) {
+        if(err){
+            response.status = parseInt(process.env.STATUS_CODE_BAD_INPUT);
+            response.message = err;
+        }
+
+
+        res.status(response.status).json(response.message);
+    });
 }
-const patchDance = function (req, res) {
+
+const _fullUpdate = function (req,dance,res, response) {
+    dance.name = req.body.name;
+    dance.countryOfOrigin = req.body.countryOfOrigin;
+    dance.save(function (err, updatedDance) {
+        if(err){
+            response.status = parseInt(process.env.STATUS_CODE_BAD_INPUT);
+            response.message = err;
+        }
+
+
+        res.status(response.status).json(response.message);
+    });
+};
+
+
+
+
+const _update = function (req, res, updateCallback) {
     const danceId = req.params.id;
     Dance.findById(danceId).exec(function (err, dance) {
         const response = {status: parseInt(process.env.STATUS_CODE_OK), message: dance};
@@ -64,56 +99,20 @@ const patchDance = function (req, res) {
             res.status(response.status).json(response.message);
         }
         else {
-            if(req.body.name)
-                dance.name = req.body.name;
-            if(req.body.countryOfOrigin)
-                dance.countryOfOrigin = req.body.countryOfOrigin;
-
-            dance.save(function (err, updatedDance) {
-                if(err){
-                    response.status = parseInt(process.env.STATUS_CODE_BAD_INPUT);
-                    response.message = err;
-                }
-
-
-                res.status(response.status).json(response.message);
-            });
+            updateCallback(req,dance,res,response);
         }
 
     });
 }
 
 const updateDance = function (req, res) {
-    const danceId = req.params.id;
-    Dance.findById(danceId).exec(function (err, dance) {
-        const response = {status: parseInt(process.env.STATUS_CODE_OK), message: dance};
-        if (err) {
-            response.status = parseInt(process.env.STATUS_SERVER_ERR);
-            response.message = err;
-        }
-        else if (!dance) {
-            response.status = parseInt(process.env.STATUS_CODE_NOT_FOUND);
-            response.message = "Dance ID not valid";
-        }
-        if (err || !dance ) {
-            res.status(response.status).json(response.message);
-        }
-        else {
-            dance.name = req.body.name;
-            dance.countryOfOrigin = req.body.countryOfOrigin;
-            dance.save(function (err, updatedDance) {
-                if(err){
-                    response.status = parseInt(process.env.STATUS_CODE_BAD_INPUT);
-                    response.message = err;
-                }
+    _update(req,res,_fullUpdate);
+};
 
+const patchDance = function (req, res) {
+    _update(req,res,_partialUpdate);
 
-                res.status(response.status).json(response.message);
-            });
-        }
-
-    });
-}
+};
 
 const deleteDance = function (req, res) {
     const danceId = req.params.id;
@@ -133,7 +132,7 @@ const deleteDance = function (req, res) {
         }
         res.status(response.status).json(response.message);
     });
-}
+};
 
 module.exports = {
     getAllDances,

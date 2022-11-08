@@ -46,8 +46,6 @@ const deleteEventFromDance= function (req, res, dance) {
             events: {_id: eventId},
         },
     },{},function (err, dance) {
-        console.log(dance);
-        console.log(err);
         res.send('hi')
     });
 }
