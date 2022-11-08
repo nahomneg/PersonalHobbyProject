@@ -55,6 +55,15 @@ const _partialUpdate = function (req,dance,res, response) {
         dance.name = req.body.name;
     if(req.body.countryOfOrigin)
         dance.countryOfOrigin = req.body.countryOfOrigin;
+    saveDance(dance,res,response);
+}
+
+const _fullUpdate = function (req,dance,res, response) {
+    dance.name = req.body.name;
+    dance.countryOfOrigin = req.body.countryOfOrigin;
+    saveDance(dance,res,response);
+};
+const  saveDance = function(dance,res,response){
     dance.save(function (err, updatedDance) {
         if(err){
             response.status = parseInt(process.env.STATUS_CODE_BAD_INPUT);
@@ -65,20 +74,6 @@ const _partialUpdate = function (req,dance,res, response) {
         res.status(response.status).json(response.message);
     });
 }
-
-const _fullUpdate = function (req,dance,res, response) {
-    dance.name = req.body.name;
-    dance.countryOfOrigin = req.body.countryOfOrigin;
-    dance.save(function (err, updatedDance) {
-        if(err){
-            response.status = parseInt(process.env.STATUS_CODE_BAD_INPUT);
-            response.message = err;
-        }
-
-
-        res.status(response.status).json(response.message);
-    });
-};
 
 
 
