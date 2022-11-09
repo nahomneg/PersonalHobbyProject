@@ -63,6 +63,7 @@ const _fullUpdate = function (req,dance,res, response) {
     dance.countryOfOrigin = req.body.countryOfOrigin;
     saveDance(dance,res,response);
 };
+
 const  saveDance = function(dance,res,response){
     dance.save(function (err, updatedDance) {
         if(err){

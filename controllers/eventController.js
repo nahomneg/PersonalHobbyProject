@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const {response} = require("express");
 const Dance = mongoose.model(process.env.DANCE_MODEL_NAME);
 
 const getAllEventsOfDance = function (req, res){
@@ -48,6 +47,29 @@ const deleteEventFromDance= function (req, res, dance) {
     },{},function (err, dance) {
         res.send('hi')
     });
+};
+const updateEventOfDance = function(req,res){
+    const danceId = req.params.danceId;
+    const eventId = req.params.eventId;
+
+    Dance.findById(danceId).select('events').exec(function (err, dance) {
+        const response= { status:process.env.STATUS_CODE_CREATED, message: dance };
+        if (err) {
+            console.log("Error finding dance");
+            response.status= 500;
+            response.message= err;
+        } else if (!dance) {
+            console.log("Error finding dance");
+            response.status= 404;
+            response.message= {"message": "dance ID not found "+danceId};
+        }
+        if (dance) {
+            const event = dance.events;
+
+        } else {
+            res.status(response.status).json(response.message);
+        }
+    });
 }
 
 const addEventToDance= function(req, res) {
@@ -74,5 +96,6 @@ const addEventToDance= function(req, res) {
 module.exports = {
     addEventToDance,
     deleteEventFromDance,
+
     getAllEventsOfDance
 };
