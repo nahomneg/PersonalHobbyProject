@@ -3,6 +3,7 @@ const Dance = mongoose.model(process.env.DANCE_MODEL_NAME);
 
 
 const getAllDances = function (req, res) {
+    console.log("hola")
     let offset = 0;
     let count = 5;
     if (req.query && req.query.offset) {
