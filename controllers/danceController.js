@@ -35,6 +35,7 @@ const getDanceById = function (req, res) {
 };
 
 const addDance = function (req, res) {
+    console.log(req.body);
     const newDance = {
         name: req.body.name,
         countryOfOrigin: req.body.countryOfOrigin,
@@ -43,7 +44,7 @@ const addDance = function (req, res) {
     Dance.create(newDance, function (err, dance) {
         const response = {status: process.env.STATUS_CODE_CREATED, message: dance};
         if (err) {
-            console.log("Error creating dance");
+            console.log("Error creating dance",err);
             response.status = 500;
             response.message = err;
         }

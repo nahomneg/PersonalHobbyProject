@@ -19,7 +19,8 @@ const getAllEventsOfDance = function (req, res){
 const addEvent= function (req, res, dance) {
     const event = {
         name:req.body.name,
-        date:Date.now()
+        date:req.body.date,
+        location:[req.body.longitude, req.body.latitude]
     }
     dance.events.push(event);
     dance.save(function(err, updatedDance) {
@@ -27,7 +28,8 @@ const addEvent= function (req, res, dance) {
         if (err) {
             response.status= 500;
             response.message= err;
-        } else {
+        }
+        else {
             response.status= 201;
             response.message= updatedDance.events;
         }
