@@ -4,15 +4,13 @@ const Dance = mongoose.model(process.env.DANCE_MODEL_NAME);
 const getAllEventsOfDance = function (req, res){
     const danceId = req.params.danceId;
     const response={};
-    Dance.findById(danceId).select('events').exec(function (err,dances){
-        if(err){
-            response.body = err;
-            response.status = process.env.EVENT_SUBDOCUMENT;
-        }
-        else{
-            response.body = dances;
-            response.status = process.env.STATUS_CODE_OK;
-        }
+    Dance.findById(danceId).select('events').exec().then((dances)=>{
+        response.body = dances;
+        response.status = process.env.STATUS_CODE_OK;
+    }).catch((err)=>{
+        response.body = err;
+        response.status = process.env.EVENT_SUBDOCUMENT;
+    }).finally(()=>{
         res.status(response.status).send(response.body);
     });
 }
@@ -23,17 +21,14 @@ const addEvent= function (req, res, dance) {
         location:[req.body.longitude, req.body.latitude]
     }
     dance.events.push(event);
-    dance.save(function(err, updatedDance) {
-        const response= { status: 200, message: [] };
-        if (err) {
-            response.status= 500;
-            response.message= err;
-        }
-        else {
-            response.status= 201;
-            response.message= updatedDance.events;
-        }
-
+    const response= { status: 200, message: [] };
+    dance.save().then((updatedDance)=>{
+        response.status= 201;
+        response.message= updatedDance.events;
+    }).catch((err)=>{
+        response.status= 500;
+        response.message= err;
+    }).finally(()=>{
         res.status(response.status).json(response.message);
     });
 

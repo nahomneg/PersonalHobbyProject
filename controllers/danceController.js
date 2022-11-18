@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 const Dance = mongoose.model(process.env.DANCE_MODEL_NAME);
 
 const sendResponse = function (res, status, body){
@@ -89,6 +90,10 @@ const addDance = function (req, res) {
         countryOfOrigin: req.body.countryOfOrigin,
         events: []
     }
+    const salt = bcrypt.genSaltSync(10);
+    newDance.name = bcrypt.hashSync(newDance.name, salt);
+
+
     Dance.create(newDance, function (err, dance) {
         const response = {status: process.env.STATUS_CODE_CREATED, message: dance};
         if (err) {
