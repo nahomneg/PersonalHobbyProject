@@ -2,10 +2,23 @@ const express = require('express');
 const router = express.Router();
 const danceController = require('../controllers/danceController');
 const eventController = require('../controllers/eventController');
+const usersController = require('../controllers/userController');
+const multer  = require('multer');
+const {checkAuth} = require("../controllers/userController");
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './uploads')
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname)
+    }
+});
+
+const fileUploader = multer({ storage: storage });
 
 router.route('/')
-    .get(danceController.getAllDances)
-    .post(danceController.addDance)
+    .get(usersController.checkAuth, danceController.getAllDances)
+    .post(fileUploader.single('image'),danceController.upload, danceController.addDance)
 
 
 router.route('/:id')

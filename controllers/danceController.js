@@ -1,13 +1,22 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const multer = require("multer");
 const Dance = mongoose.model(process.env.DANCE_MODEL_NAME);
+
 
 const sendResponse = function (res, status, body){
     res.status(status).json(body);
 }
+const upload = function (req, res, next) {
+    console.log('ho');
+        req.imageurl = req.protocol + '://' + req.get('host') + '/' + req.file.path;
+        next();
+
+}
+
 const getAllDances = function (req, res) {
     let offset = 0;
-    let count = 5;
+    let count = 10;
     const maxCount = parseInt(process.env.MAX_COUNT);
 
     if (req.query && req.query.offset) {
@@ -88,21 +97,24 @@ const addDance = function (req, res) {
     const newDance = {
         name: req.body.name,
         countryOfOrigin: req.body.countryOfOrigin,
+        imageurl: req.imageurl,
         events: []
     }
-    const salt = bcrypt.genSaltSync(10);
-    newDance.name = bcrypt.hashSync(newDance.name, salt);
 
-
-    Dance.create(newDance, function (err, dance) {
-        const response = {status: process.env.STATUS_CODE_CREATED, message: dance};
-        if (err) {
+    const response = {status: process.env.STATUS_CODE_CREATED, message: {}};
+    Dance.create(newDance)
+        .then((dance)=>{
+            response.body = dance;
+        }).catch((err) =>{
             console.log("Error creating dance", err);
             response.status = 500;
             response.message = err;
-        }
-        res.status(response.status).json(response.message);
-    });
+    }).finally(()=>{sendResponse(res,response.status,response.body)
+    })
+
+
+
+
 };
 
 const _partialUpdate = function (req, dance, res, response) {
@@ -187,5 +199,6 @@ module.exports = {
     addDance,
     updateDance,
     deleteDance,
-    patchDance
+    patchDance,
+        upload
 };

@@ -42,52 +42,49 @@ const deleteEventFromDance= function (req, res, dance) {
             events: {_id: eventId},
         },
     },{},function (err, dance) {
-        res.send('hi')
+        res.status(process.env.STATUS_CODE_UPDATED).json(dance);
     });
 };
-const updateEventOfDance = function(req,res){
-    const danceId = req.params.danceId;
-    const eventId = req.params.eventId;
-
-    Dance.findById(danceId).select('events').exec(function (err, dance) {
-        const response= { status:process.env.STATUS_CODE_CREATED, message: dance };
-        if (err) {
-            console.log("Error finding dance");
-            response.status= 500;
-            response.message= err;
-        } else if (!dance) {
-            console.log("Error finding dance");
-            response.status= 404;
-            response.message= {"message": "dance ID not found "+danceId};
-        }
-        if (dance) {
-            const event = dance.events;
-
-        } else {
-            res.status(response.status).json(response.message);
-        }
-    });
+// const updateEventOfDance = function(req,res){
+//     const danceId = req.params.danceId;
+//     const eventId = req.params.eventId;
+//
+//     Dance.findById(danceId).select('events').exec(function (err, dance) {
+//         const response= { status:process.env.STATUS_CODE_CREATED, message: dance };
+//         if (err) {
+//             console.log("Error finding dance");
+//             response.status= 500;
+//             response.message= err;
+//         } else if (!dance) {
+//             console.log("Error finding dance");
+//             response.status= 404;
+//             response.message= {"message": "dance ID not found "+danceId};
+//         }
+//         if (dance) {
+//             const event = dance.events;
+//
+//         } else {
+//             res.status(response.status).json(response.message);
+//         }
+//     });
+// }
+const appendEvent = function( dance, res, danceId) {
+    const response= { status:process.env.STATUS_CODE_CREATED, message: dance };
+    if (!dance) {
+        console.log("Error finding dance");
+        response.status= 404;
+        response.message= {"message": "dance ID not found "+danceId};
+    }
+    if (dance) {
+        addEvent(req, res, dance);
+    } else {
+        res.status(response.status).json(response.message);
+    }
 }
 
 const addEventToDance= function(req, res) {
     const danceId= req.params.id;
-    Dance.findById(danceId).select("events").exec(function(err, dance) {
-        const response= { status:process.env.STATUS_CODE_CREATED, message: dance };
-        if (err) {
-            console.log("Error finding dance");
-            response.status= 500;
-            response.message= err;
-        } else if (!dance) {
-            console.log("Error finding dance");
-            response.status= 404;
-            response.message= {"message": "dance ID not found "+danceId};
-        }
-        if (dance) {
-            addEvent(req, res, dance);
-        } else {
-            res.status(response.status).json(response.message);
-        }
-    });
+    Dance.findById(danceId).select("events").then( (dance) => appendEvent(dance, res, danceId ));
 }
 
 module.exports = {

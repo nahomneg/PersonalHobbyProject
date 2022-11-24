@@ -10,6 +10,10 @@ const danceSchema = mongoose.Schema({
         type:String,
         required: true
     },
+    imageurl:{
+        type:String,
+        require:true
+    },
     events: {
         type: [eventSchema],
         default:[
